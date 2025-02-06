@@ -1,10 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useAppDispatch } from "@/redux/hook";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
+import { verifyToken } from "@/utils/verifyToken";
+import { setUser, TUser } from "@/redux/features/auth/authSlice";
+import { toast } from "sonner";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -12,22 +18,27 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [login] = useLoginMutation();
+
   const handleSubmit = async (e: React.FormEvent) => {
+    const toastId = toast.loading("Logging...");
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Add your authentication logic here
+      const res = await login({ email, password }).unwrap();
+      const user = verifyToken(res.data.accessToken) as TUser;
 
-      // For demo purposes, show error if password is too short
-      if (password.length < 6) {
-        throw new Error("Invalid credentials");
-      }
-    } catch {
-      setError("Invalid email or password");
+      dispatch(setUser({ user: user, token: res.data.accessToken }));
+      toast.success("Logged In", { id: toastId, duration: 3000 });
+
+      navigate("/messages");
+    } catch (err: any) {
+      console.log(err);
+      toast.error("Something went wrong", { id: toastId, duration: 3000 });
     } finally {
       setIsLoading(false);
     }

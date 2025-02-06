@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   BaseQueryApi,
   BaseQueryFn,
@@ -10,12 +11,11 @@ import { RootState } from "../store";
 import { logout, setUser } from "../features/auth/authSlice";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:5000/api",
+  // baseUrl: import.meta.env.VITE_PUBLIC_BASE_API,
+  baseUrl: import.meta.env.VITE_LOCAL_BASE_API,
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.token;
-
-    // token && headers.set("authorization", `${token}`);
 
     if (token) {
       headers.set("authorization", `${token}`);
@@ -39,7 +39,7 @@ const baseQueryWithRefreshToken: BaseQueryFn<
   if (result?.error?.status === 401) {
     //* Send Refresh Token
     console.log("Sending refresh token");
-    const res = await fetch("http://localhost:5000/api/v1/auth/refresh-token", {
+    const res = await fetch("http://localhost:5000/api/auth/refresh-token", {
       method: "POST",
       credentials: "include",
     });

@@ -1,4 +1,5 @@
 import App from "@/App";
+import ProtectedRoutes from "@/components/layout/ProtectedRoutes";
 import HomePage from "@/pages/home/Home";
 import LoginPage from "@/pages/login/LoginPage";
 import MessagePage from "@/pages/message/MessagePage";
@@ -16,16 +17,20 @@ const routers = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "login",
+        path: "/login",
         element: <LoginPage />,
       },
       {
-        path: "register",
+        path: "/register",
         element: <RegisterPage />,
       },
       {
-        path: "messages",
-        element: <MessagePage />,
+        path: "/messages",
+        element: (
+          <ProtectedRoutes role="USER">
+            <MessagePage />
+          </ProtectedRoutes>
+        ),
       },
     ],
   },
