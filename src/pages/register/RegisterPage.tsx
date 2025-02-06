@@ -1,10 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useAppDispatch } from "@/redux/hook";
+import { useRegisterMutation } from "@/redux/features/auth/authApi";
+import { toast } from "sonner";
+import { verifyToken } from "@/utils/verifyToken";
+import { setUser, TUser } from "@/redux/features/auth/authSlice";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -13,27 +19,30 @@ const RegisterPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [register] = useRegisterMutation();
+
   const handleSubmit = async (e: React.FormEvent) => {
+    const toastId = toast.loading("Registration...");
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Add your signup logic here
+      const res = await register({ name, email, password }).unwrap();
+      const user = verifyToken(res.data.accessToken) as TUser;
 
-      // For demo purposes, show error if password is too short
-      if (password.length < 6) {
-        throw new Error("Password must be at least 6 characters long");
-      }
+      dispatch(setUser({ user: user, token: res.data.accessToken }));
+      toast.success("Registration is successful", {
+        id: toastId,
+        duration: 3000,
+      });
 
-      // If signup is successful, you might want to redirect to login page or directly to the chat
-      console.log("Signup successful");
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An error occurred during signup"
-      );
+      navigate("/messages");
+    } catch (err: any) {
+      console.log(err);
+      toast.error("Something went wrong", { id: toastId, duration: 3000 });
     } finally {
       setIsLoading(false);
     }
