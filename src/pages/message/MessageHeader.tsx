@@ -1,6 +1,8 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { logout } from "@/redux/features/auth/authSlice";
+import { useAppDispatch } from "@/redux/hook";
+import { LogOut, Plus } from "lucide-react";
 import { useState } from "react";
 
 type User = {
@@ -13,6 +15,11 @@ type User = {
 };
 
 const MessageHeader = () => {
+  const dispatch = useAppDispatch();
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
   const [users] = useState<User[]>([
     {
       id: 1,
@@ -57,8 +64,13 @@ const MessageHeader = () => {
           <div className="text-sm text-gray-400">{users[0].email}</div>
         </div>
       </div>
-      <Button variant="ghost" size="icon" className="text-gray-400">
-        <Plus className="h-5 w-5" />
+      <Button
+        onClick={handleLogout}
+        variant="ghost"
+        size="icon"
+        className="text-gray-400"
+      >
+        <LogOut className="h-5 w-5" />
       </Button>
     </div>
   );
