@@ -7,6 +7,7 @@ export type TUser = {
   email: string;
   role: "USER" | "ADMIN";
   status: "ACTIVE" | "BLOCKED";
+  avatar?: string;
   iat: number;
   exp: number;
 };
