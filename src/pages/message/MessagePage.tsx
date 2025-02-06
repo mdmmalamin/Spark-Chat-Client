@@ -3,6 +3,7 @@ import MessageHeader from "./MessageHeader";
 import MessageChatContainer from "./MessageChatContainer";
 import MessageInputArea from "./MessageInputArea";
 import MessageUsersList from "./MessageUsersList";
+import MessageChatsList from "./MessageChatsList";
 
 export type Message = {
   id: number;
@@ -20,8 +21,11 @@ const MessagePage = () => {
 
   return (
     <div className="flex h-screen bg-black text-white">
-      {/* Left side - Chat */}
-      <div className="flex flex-col w-2/3 border-r border-gray-800">
+      {/* Left side - Chats list */}
+      <MessageChatsList />
+
+      {/* Middle side - Chat */}
+      <div className="flex flex-col w-2/4 border-x border-gray-800">
         {/* Chat Header */}
         <MessageHeader />
 

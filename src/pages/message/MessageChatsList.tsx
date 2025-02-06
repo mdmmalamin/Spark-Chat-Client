@@ -1,57 +1,50 @@
 import { Input } from "@/components/ui/input";
-import { useGetAllUsersQuery } from "@/redux/features/user/userApi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Search } from "lucide-react";
+import { useGetAllChatsQuery } from "@/redux/features/chat/chatApi";
 
-type TUser = {
+export type Root = {
   _id: string;
-  name: string;
-  email: string;
-  role: "USER" | "ADMIN";
-  status: "ACTIVE" | "BLOCKED";
-  avatar?: string;
-  __v: number;
+  members: Member[];
+  unreadMessageCount: number;
   createdAt: string;
   updatedAt: string;
+  __v: number;
+  lastMessage: LastMessage;
 };
 
-const MessageUsersList = () => {
+export type Member = {
+  _id: string;
+  name: string;
+  role: string;
+  email: string;
+  status: string;
+  avatar?: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+};
+
+export type LastMessage = {
+  _id: string;
+  chatId: string;
+  sender: string;
+  text: string;
+  read: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+};
+
+const MessageChatsList = () => {
   const {
-    data: usersData,
+    data: chatsData,
     isLoading,
     isFetching,
-  } = useGetAllUsersQuery(undefined);
+  } = useGetAllChatsQuery(undefined);
 
-  console.log(usersData, isLoading, isFetching);
-
-  // const [users] = useState<TUser[]>([
-  //   {
-  //     id: 1,
-  //     name: "Sofia Davis",
-  //     email: "sofia@example.com",
-  //     avatar:
-  //       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-AYNkaSfoDA2kkf6BRCbOaoKV20gFye.png",
-  //     lastMessage: "Sure, I can help with that.",
-  //     online: true,
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "John Doe",
-  //     email: "john@example.com",
-  //     avatar: "/placeholder.svg?height=40&width=40",
-  //     lastMessage: "Thanks for your help!",
-  //     online: false,
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Alice Smith",
-  //     email: "alice@example.com",
-  //     avatar: "/placeholder.svg?height=40&width=40",
-  //     lastMessage: "See you tomorrow!",
-  //     online: true,
-  //   },
-  // ]);
+  console.log(chatsData, isLoading, isFetching);
 
   return (
     <div className="w-1/4 flex flex-col">
@@ -65,15 +58,18 @@ const MessageUsersList = () => {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        {usersData?.data?.map((user: TUser) => (
+        {chatsData?.data?.map((chat: Root) => (
           <div
-            key={user._id}
+            key={chat._id}
             className="flex items-center gap-3 p-4 hover:bg-gray-800 cursor-pointer"
           >
             <Avatar className="h-10 w-10">
-              <AvatarImage src={user?.avatar} alt={user.name} />
+              <AvatarImage
+                src={chat?.members?.[1]?.avatar}
+                alt={chat?.members?.[1]?.name}
+              />
               <AvatarFallback className="bg-gray-700 font-bold">
-                {user.name
+                {chat?.members?.[1]?.name
                   .split(" ")
                   .map((n) => n[0])
                   .join("")}
@@ -81,12 +77,13 @@ const MessageUsersList = () => {
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex justify-between items-baseline">
-                <div className="font-medium truncate">{user.name}</div>
+                <div className="font-medium truncate">
+                  {chat?.members?.[1]?.name}
+                </div>
                 <div className="text-xs text-gray-400">12:34 PM</div>
               </div>
               <div className="text-sm text-gray-400 truncate">
-                last message
-                {/* {user.lastMessage} */}
+                {chat?.lastMessage?.text || "No messages yet"}
               </div>
             </div>
             {/* {user.online && (
@@ -99,4 +96,4 @@ const MessageUsersList = () => {
   );
 };
 
-export default MessageUsersList;
+export default MessageChatsList;
